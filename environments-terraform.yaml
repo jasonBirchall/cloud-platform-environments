@@ -44,7 +44,7 @@ jobs:
             PINGDOM_PASSWORD: ((cloud-platform-environments-pingdom.pingdom_password))
             PINGDOM_API_KEY: ((cloud-platform-environments-pingdom.pingdom_api_key))
             # the variables prefixed with PIPELINE_ are used by the apply script
-            PIPELINE_CLUSTER: jason
+            PIPELINE_CLUSTER: "cp-2302-1645"
             PIPELINE_STATE_BUCKET: cloud-platform-terraform-state
             PIPELINE_STATE_KEY_PREFIX: "cloud-platform-environments/"
             PIPELINE_STATE_REGION: "eu-west-1"
