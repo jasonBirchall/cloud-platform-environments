@@ -6,8 +6,8 @@
  */
 module "cp_team_test_ecr_credentials" {
   source    = "github.com/ministryofjustice/cloud-platform-terraform-ecr-credentials?ref=4.3"
-  repo_name = "cp-poornima-dev-module"
-  team_name = "cp-team"
+  repo_name = "test-demo"
+  team_name = "test-team"
 
   # aws_region = "eu-west-2"     # This input is deprecated from version 3.2 of this module
 
