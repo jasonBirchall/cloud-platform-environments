@@ -67,7 +67,7 @@ class CpEnv
       key = "#{key_prefix}#{cluster}/#{namespace}/terraform.tfstate"
 
       cmd = [
-        %(#{terraform_executable}),
+        %(#{terraform_executable} init),
         %(-backend-config="bucket=#{bucket}"),
         %(-backend-config="key=#{key}"),
         %(-backend-config="dynamodb_table=#{lock_table}"),
