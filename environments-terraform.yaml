@@ -1,0 +1,79 @@
+resources:
+- name: cloud-platform-environments-repo
+  type: git
+  source:
+    uri: https://github.com/jasonbirchall/cloud-platform-environments.git
+    branch: main
+- name: pipeline-tools-image
+  type: docker-image
+  source:
+    repository: ministryofjustice/cloud-platform-pipeline-tools
+    tag: "tf-upgrade"
+    username: ((ministryofjustice-dockerhub.dockerhub_username))
+    password: ((ministryofjustice-dockerhub.dockerhub_password))
+
+
+groups:
+- name: environments-terraform
+  jobs:
+    - apply-jason
+
+jobs:
+  - name: apply-jason
+    serial: true
+    plan:
+      - in_parallel:
+        - get: every-120m
+          trigger: true
+        - get: cloud-platform-environments-repo
+          trigger: false
+        - get: pipeline-tools-image
+      - task: apply-environments
+        image: pipeline-tools-image
+        config:
+          platform: linux
+          inputs:
+            - name: cloud-platform-environments-repo
+          params:
+            AWS_ACCESS_KEY_ID: ((aws-creds.access-key-id))
+            AWS_SECRET_ACCESS_KEY: ((aws-creds.secret-access-key))
+            KUBECONFIG: /tmp/kubeconfig
+            KUBE_CONFIG_PATH: /tmp/kubeconfig
+            TF_PLUGIN_CACHE_DIR: /tmp/terraform-plugin-cache
+            PINGDOM_USER: ((cloud-platform-environments-pingdom.pingdom_user))
+            PINGDOM_PASSWORD: ((cloud-platform-environments-pingdom.pingdom_password))
+            PINGDOM_API_KEY: ((cloud-platform-environments-pingdom.pingdom_api_key))
+            # the variables prefixed with PIPELINE_ are used by the apply script
+            PIPELINE_CLUSTER: jason
+            PIPELINE_STATE_BUCKET: cloud-platform-terraform-state
+            PIPELINE_STATE_KEY_PREFIX: "cloud-platform-environments/"
+            PIPELINE_STATE_REGION: "eu-west-1"
+            PIPELINE_TERRAFORM_STATE_LOCK_TABLE: "cloud-platform-environments-terraform-lock"
+            TF_VAR_concourse_url: "https://concourse.apps.cp-2302-1645.cloud-platform.service.justice.gov.uk/"
+            TF_VAR_concourse_basic_auth_username: ((concourse-basic-auth.username))
+            TF_VAR_concourse_basic_auth_password: ((concourse-basic-auth.password))
+            TF_VAR_cluster_name: "cp-2302-1645"
+            TF_VAR_cluster_state_bucket: cloud-platform-terraform-state
+            TF_VAR_cluster_state_key: "cloud-platform/jason/terraform.tfstate"
+            TF_VAR_github_owner: "ministryofjustice"
+            TF_VAR_github_token: ((github-actions-secrets-token.token))
+          run:
+            path: /bin/sh
+            dir: cloud-platform-environments-repo
+            args:
+              - -c
+              - |
+                mkdir -p "${TF_PLUGIN_CACHE_DIR}"
+                (
+                  aws s3 cp s3://cloud-platform-concourse-kubeconfig/jason-test-config /tmp/kubeconfig
+                )
+                bundle install --without development test
+                ./bin/apply
+        on_failure:
+          put: slack-alert
+          params:
+            <<: *SLACK_NOTIFICATION_DEFAULTS
+            attachments:
+              - color: "danger"
+                <<: *SLACK_ATTACHMENTS_DEFAULTS
+
