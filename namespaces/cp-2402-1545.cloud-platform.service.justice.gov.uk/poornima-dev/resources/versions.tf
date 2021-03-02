@@ -9,7 +9,7 @@ terraform {
       source = "hashicorp/kubernetes"
     }
     pingdom = {
-      source = "registry.terraform.io/-/pingdom"
+      source = "russellcardullo/pingdom"
       version = "1.1.3"
     }
   }
