@@ -45,8 +45,7 @@ class CpEnv
       begin
         retries ||= 0
         puts "Retry ##{retries} to do terraform init after replacing provider"
-        tf_init 
-        raise
+        tf_init
       rescue
         if (retries += 1) < 2
           tf_state_replace

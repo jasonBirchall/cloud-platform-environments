@@ -7,7 +7,7 @@ class CpEnv
 
       unless can_fail || status.success?
         log("red", "Command: #{cmd} failed.")
-        log("red", stderr)
+        log("red", stderr, "status" status)
         raise
       end
 
