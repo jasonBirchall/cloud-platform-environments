@@ -41,8 +41,8 @@ class CpEnv
       return unless FileTest.directory?(tf_dir)
 
       log("blue", "applying terraform resources for namespace #{namespace} in #{cluster}")
-      tf_state_replace 
       tf_init
+      tf_state_replace
       tf_apply
     end
 
