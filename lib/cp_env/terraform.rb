@@ -85,8 +85,8 @@ class CpEnv
           %(#{terraform_executable} state replace-provider registry.terraform.io/-/pingdom registry.terraform.io/russellcardullo/pingdom),
           %(-auto-approve)
         ].join(" ")
-        # execute("cd #{tf_dir}; #{cmd}"
         log("blue", "replacing pingdom provider for namespace #{namespace} in #{cluster}") 
+        execute("cd #{tf_dir}; #{cmd}"
       end
     end
 
