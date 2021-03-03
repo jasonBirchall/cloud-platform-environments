@@ -41,8 +41,18 @@ class CpEnv
       return unless FileTest.directory?(tf_dir)
 
       log("blue", "applying terraform resources for namespace #{namespace} in #{cluster}")
-      tf_init
-      tf_state_replace
+
+      begin
+        retries ||= 0
+        puts "Retry ##{retries} to do terraform init after replacing provider"
+        tf_init 
+        raise
+      rescue
+        if (retries += 1) < 2
+          tf_state_replace
+          retry 
+        end
+      end
       tf_apply
     end
 
