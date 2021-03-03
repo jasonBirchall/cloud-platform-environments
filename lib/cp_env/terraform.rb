@@ -86,7 +86,7 @@ class CpEnv
           %(-auto-approve)
         ].join(" ")
         log("blue", "replacing pingdom provider for namespace #{namespace} in #{cluster}") 
-        execute("cd #{tf_dir}; #{cmd}"
+        execute("cd #{tf_dir}; #{cmd}")
       end
     end
 
