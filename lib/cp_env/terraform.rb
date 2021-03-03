@@ -81,10 +81,7 @@ class CpEnv
     #terraform state replace-provider registry.terraform.io/-/pingdom registry.terraform.io/russellcardullo/pingdom
     def tf_state_replace
       if terraform_executable.match(/terraform0.13/) &&  Dir.glob("#{tf_dir}/*pingdom*.tf").size>0
-        cmd = [
-          %(#{terraform_executable} state replace-provider registry.terraform.io/-/pingdom registry.terraform.io/russellcardullo/pingdom),
-          %(-auto-approve)
-        ].join(" ")
+        cmd = "#{terraform_executable} state replace-provider registry.terraform.io/-/pingdom registry.terraform.io/russellcardullo/pingdom"
         log("blue", "replacing pingdom provider for namespace #{namespace} in #{cluster}") 
         execute("cd #{tf_dir}; #{cmd}")
       end
