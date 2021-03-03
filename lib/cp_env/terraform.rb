@@ -41,6 +41,7 @@ class CpEnv
       return unless FileTest.directory?(tf_dir)
 
       log("blue", "applying terraform resources for namespace #{namespace} in #{cluster}")
+      tf_state_replace 
       tf_init
       tf_apply
     end
@@ -75,6 +76,18 @@ class CpEnv
       ].join(" ")
 
       execute("cd #{tf_dir}; #{cmd}")
+    end
+
+    #terraform state replace-provider registry.terraform.io/-/pingdom registry.terraform.io/russellcardullo/pingdom
+    def tf_state_replace
+      if terraform_executable.match(/terraform0.13/) &&  Dir.glob("#{tf_dir}/*pingdom*.tf").size>0
+        cmd = [
+          %(#{terraform_executable} state replace-provider registry.terraform.io/-/pingdom registry.terraform.io/russellcardullo/pingdom),
+          %(-auto-approve)
+        ].join(" ")
+        # execute("cd #{tf_dir}; #{cmd}"
+        log("blue", "replacing pingdom provider for namespace #{namespace} in #{cluster}") 
+      end
     end
 
     def tf_apply
